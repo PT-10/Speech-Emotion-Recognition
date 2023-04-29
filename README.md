@@ -24,7 +24,7 @@ virtualenv venv
 
 5. To enter the virtual environment:
 ``` 
-source venv/bin/activate
+venv\Scripts\activate
 ```
 
 6. Install the requirements for the current environment:
