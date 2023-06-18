@@ -3,37 +3,19 @@ import json
 import torch
 from model import SCNNB
 from flask import *
-from flask import Flask, jsonify, request
+from flask import Flask, request
 import librosa
 import numpy as np
 
 app = Flask(__name__)
-
-model = SCNNB()
-model.load_state_dict(torch.load("ravdess_ffn.pth"))
+   
+train_model = SCNNB()
+train_model.load_state_dict(torch.load("ravdess_trained.pth"))
 
 class Features():
     
     def augment_input(self, data, sampling_rate, augmented_type = str()):
-        # data, sampling_rate = librosa.load(audio_data, format='wav')
-        # self.sampling_rate = sampling_rate
-        
-        if augmented_type == "noise":
-            noise_amp = 0.035*np.random.uniform()*np.amax(data)
-            data = data + noise_amp*np.random.normal(size=data.shape[0])
-            return data
-
-        if augmented_type == "stretch":
-            return librosa.effects.time_stretch(data, rate = 0.8)
-
-        if augmented_type == "shift":
-            shift_range = int(np.random.uniform(low=-5, high = 5)*1000)
-            return np.roll(data, shift_range)
-
-        if augmented_type == "pitch":
-            return librosa.effects.pitch_shift(data, sampling_rate, pitch_factor = 0.7)
         return data
-    
     
     def extract_features(self, X, sampling_rate):
         result = np.array([])
@@ -71,27 +53,14 @@ def get_prediction(file_io, sampling_rate):
     # Convert the features to a tensor and unsqueeze to add a batch dimension
     input_tensor = torch.tensor(input).unsqueeze(0)
 
-    # Make a prediction using the model
-    model.eval()
+    # Make a prediction using the train_model
+    train_model.eval()
     with torch.no_grad():
-        output = model(input_tensor.float())
+        output = train_model(input_tensor.float())
         _, predicted = torch.max(output.data, 1)
         class_label = predicted.item()
         
     return class_labels[class_label]
-
-
-# @app.route('/predict', methods=['POST'])
-# def predict():
-#     if request.method == 'POST':
-#         file = request.files['file']
-#         audio = file.filename.split(".")[0]
-#         prediction = get_prediction(audio)
-#         print("Predicted emotion is",prediction)
-#     return jsonify({'file': audio, 'class_name': prediction})
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
 
    
 @app.route('/')
