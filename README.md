@@ -12,32 +12,27 @@ git clone https://github.com/PT-10/Speech-Emotion-Recognition.git
 cd Speech-Emotion-Recognition
 ```
 
-3. If you don't already have virtualenv installed
+3. If you don't already have anaconda prompt installed, refer to:
 ```
-pip install virtualenv
+https://docs.anaconda.com/free/anaconda/install/
 ```
 
-4. Create a virtual environment named venv:
+4. Create a virtual environment in anaconda prompt. Replace <env> with your env name:
 ```
-virtualenv venv
+conda create --name <env> --file requirements.txt
 ```
 
 5. To enter the virtual environment:
 ``` 
-venv\Scripts\activate
+conda activate <env>
 ```
 
-6. Install the requirements for the current environment:
-```
-pip install -r requirements.txt
-```
-
-7. Set flask app to app.py:
+6. Set flask app to app.py:
 ```
 set FLASK_APP=app.py
 ```
 
-8. Run flask server:
+7. Run flask server:
 ```
-python -m flask run
+flask run
 ```
