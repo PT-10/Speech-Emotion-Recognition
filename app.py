@@ -7,7 +7,7 @@ from flask import Flask, request
 import librosa
 import numpy as np
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
    
 train_model = SCNNB()
 train_model.load_state_dict(torch.load("ravdess_trained.pth"))
@@ -62,7 +62,6 @@ def get_prediction(file_io, sampling_rate):
         
     return class_labels[class_label]
 
-   
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -70,16 +69,16 @@ def home():
 @app.route('/',methods = ['POST', 'GET'])  
 def predict():
     if request.method == 'POST':
-        file = request.files['file']
+        file = request.files['file'] 
         with io.BytesIO(file.read()) as file_obj:
             data, sampling_rate = librosa.load(file_obj, sr=None)
         name = file.filename
         if file:
             prediction = get_prediction(data, sampling_rate)
-            return f'File {name} uploaded successfully, predicted emotion is {prediction}'
+            return render_template('index.html', prediction=f'{prediction}', filename = name)
         else:
-            return "Please select a file"
-    return f'Invalid xyz' 
+            return render_template('index.html', error="Please select a file")
+    return render_template('index.html') 
   
    
 if __name__ == '__main__':  
